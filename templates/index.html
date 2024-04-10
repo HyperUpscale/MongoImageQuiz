@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz App</title>
+</head>
+<body>
+  <h1>Quiz App</h1>
+
+  <h2>Create a New Quiz</h2>
+  <form method="post" action="{{ url_for('create') }}">
+    <label for="name">Name:</label>
+    <input type="text" name="name" id="name" required>
+    <br>
+    <label for="category">Category:</label>
+    <select name="category" id="category">
+      <option value="cat1">Category 1</option>
+      <option value="cat2">Category 2</option>
+      <option value="cat3">Category 3</option>
+      <option value="cat4">Category 4</option>
+      <option value="cat5">Category 5</option>
+      <option value="cat6">Category 6</option>
+      <option value="cat7">Category 7</option>
+    </select>
+    <br>
+    <button type="submit">Create</button>
+  </form>
+<br>
+<!-- Add link to images.html -->
+<br>
+<a href="{{ url_for('images') }}">View All Images </a>
+<br>
+<br>
+
+  <h2>Existing Quizzes</h2>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message | safe }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+<!-- Quizzes Table -->
+<table id="quizTable">
+  <thead>
+      <tr>
+          <th onclick="sortTable(0)">Name</th>
+          <th onclick="sortTable(1)">Category</th>
+          <th onclick="sortTable(2)">Images</th>
+          <th>Actions</th>
+      </tr>
+  </thead>
+  <tbody>
+      {% for quiz in quizzes %}
+      <tr>
+          <td>{{ quiz.name }}</td>
+          <td>{{ quiz.category }}</td>
+          <td>{{ image_counts[quiz._id|string] }}</td>
+          <td>
+              <a href="{{ url_for('edit', quiz_id=quiz._id) }}" class="btn btn-primary">Edit</a>
+              <a href="{{ url_for('start', quiz_id=quiz._id) }}" class="btn btn-success">Start=</a>
+              <a href="{{ url_for('pages', quiz_id=quiz._id) }}" class="btn btn-success">Quiz Page </a>
+              <a href="{{ url_for('delete_quiz', quiz_id=quiz._id) }}" class="btn btn-danger">Delete</a>
+          </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+
+<script>
+function sortTable(n) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.getElementById("quizTable");
+  switching = true;
+  dir = "asc";
+
+  while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < (rows.length - 1); i++) {
+          shouldSwitch = false;
+          x = rows[i].getElementsByTagName("TD")[n];
+          y = rows[i + 1].getElementsByTagName("TD")[n];
+          if (dir == "asc") {
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                  shouldSwitch = true;
+                  break;
+              }
+          } else if (dir == "desc") {
+              if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                  shouldSwitch = true;
+                  break;
+              }
+          }
+      }
+      if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+          switchcount++;
+      } else {
+          if (switchcount == 0 && dir == "asc") {
+              dir = "desc";
+              switching = true;
+          }
+      }
+  }
+}
+</script>
+
+
+
+</body>
+</html>

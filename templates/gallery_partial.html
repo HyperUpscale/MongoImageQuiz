@@ -1,0 +1,22 @@
+{% for image in images %}
+<div class="image-container">
+    <img src="data:image/jpg;base64,{{ image['thumbnail'] }}" alt="{{ image['filename'] }}">
+    <div class="image-details">
+        <strong>Quiz Name:</strong>
+        <select class="editable quiz-name" data-field="quiz_id" data-id="{{ image['_id'] }}">
+            {% for quiz in quizzes %}
+            <option value="{{ quiz._id }}" {% if image['quiz_id'] == quiz._id|string %}selected{% endif %}>{{ quiz.name }}</option>
+            {% endfor %}
+        </select>
+        <p><strong>Score:</strong> <span class="editable" data-field="score" data-id="{{ image['_id'] }}" contenteditable="true">{{ image['score'] }}</span></p>
+        <p><strong>Description:</strong> <span class="editable" data-field="image_description" data-id="{{ image['_id'] }}" contenteditable="true">{{ image['image_description'] }}</span></p>
+        <p><strong>Assignment:</strong> <select class="editable" data-field="assignment" data-id="{{ image['_id'] }}">
+            <option value="Low" {% if image.assignment == 'Low' %}selected{% endif %}>Low</option>
+            <option value="Medium" {% if image.assignment == 'Medium' %}selected{% endif %}>Medium</option>
+            <option value="High" {% if image.assignment == 'High' %}selected{% endif %}>High</option>
+        </select></p>
+        <a href="#" class="delete-btn" data-id="{{ image['_id'] }}" data-quiz-id="{{ image.quiz_id }}">Delete</a>
+        <button class="update-btn" data-id="{{ image['_id'] }}">Update</button>
+    </div>
+</div>
+{% endfor %}

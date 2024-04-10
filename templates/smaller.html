@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery</title>
+  <style>
+    .gallery {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .image-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .image-details {
+      margin-top: 10px;
+    }
+    .thumbnail {
+      width: 100px; /* Adjust thumbnail size as needed */
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Image Gallery with Thumbnails</h1>
+  <div class="gallery">
+    <!-- Left column: Original images -->
+    <div class="left-column">
+      {% for image in images %}
+      <div class="image-container">
+        <img src="data:image/jpg;base64,{{ image['data'] }}" alt="{{ image['filename'] }}">
+        <div class="image-details">
+          <strong>Quiz Name:</strong> {{ image.quiz_name }}<br>
+          <strong>Score:</strong> {{ image.score }}<br>
+          <strong>Description:</strong> {{ image.image_description }}<br>
+          <strong>Assignment:</strong> {{ image.assignment }}<br>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <!-- Right column: Thumbnails -->
+    <div class="right-column">
+      {% for image in images %}
+      <div class="image-container">
+        <img class="thumbnail" src="path/to/thumbnail/{{ image['filename'] }}" alt="Thumbnail of {{ image['filename'] }}">
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

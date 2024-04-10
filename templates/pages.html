@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title>Quiz Page</title>
+    <style>
+        .image-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .image-card {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .card-details {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>PAGES for quiz: {{ quiz.name }}</h2>
+    <h2>Current Score: {{ current_score }}</h2>
+
+    <a href="{{ url_for('edit', quiz_id=quiz._id) }}">
+        <h2>EDIT this Quiz: {{ quiz.name }}</h2>
+    </a>
+
+    <h2>{{ quiz.name }}</h2>
+    <h2>Current Score: {{ current_score }}</h2>
+
+    <a href="{{ url_for('quiz_result', quiz_id=quiz_id) }}"> SCORE Page</a>
+
+    <br>
+
+    <div class="image-container">
+        {% for image_id in next_image_ids %}
+            {% set image = images_collection.find_one({'_id': ObjectId(image_id)}) %}
+            {% if image and image['data'] %}
+                <div class="image-card">
+                    <a href="{{ url_for('pages', quiz_id=quiz._id, image_id=image._id) }}">
+                        <img src="data:image/jpg;base64,{{ image['data'] }}" alt="{{ image['filename'] }}" width="300">
+                    </a>
+                    <div class="card-details">
+                        <p>Score: {{ image.score }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <p>No image data available for image with ID: {{ image_id }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <H2><a href="{{ url_for('index') }}">Back to Home</a></H2>
+    <H2><a href="{{ url_for('reset') }}">Reset Score</a></H2>
+
+    <h2>Page {{ pages_shown }}</h2>
+    <h2> Available score images quiz {{ quiz.name }}: ({{ image_count }} images)</h2>
+
+    <h2>Remaining images: {{ remaining_images }}</h2>
+
+    <h2>Images before the result page {{ image_count - session.get('images_shown', 0) }}</h2>
+
+    <h2> Total images for this quiz is: ({{ image_counts[quiz._id|string] }} images )</h2>
+
+</body>
+</html>

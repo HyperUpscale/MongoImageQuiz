@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Details</title>
+    <style>
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .image-container img {
+            margin: 10px;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .gallery div {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Current Score: {{ current_score }}</h2>
+
+    <a href="{{ url_for('index') }}">Previous Page</a>
+    <br>
+    <a href="{{ url_for('result') }}">SCORE PAGE</a>
+    <br>
+    <a href="{{ url_for('reset') }}">Reset</a>
+    
+    <h2>Next Images</h2>
+    <div class="image-container">
+        {% for image in next_images %}
+        <a href="{{ url_for('quiz_images', image_id=image['_id']) }}">
+            <img src="data:image/png;base64,{{ image['image_data'] }}" width="200">
+            <p>Category: {{ image['category'] }}</p>
+            <p>Score: {{ image['score'] }}</p>
+        </a>
+        {% endfor %}
+    </div>
+
+    <h2>Gallery</h2>
+    <div class="gallery">
+        {% for image in gallery %}
+        <div>
+            <img src="data:image/png;base64,{{ image['image_data'] }}" width="100">
+            <p>Category: {{ image['category'] }}</p>
+            <p>Score: {{ image['score'] }}</p>
+            <a href="{{ url_for('delete_image', image_id=image['_id']) }}">x</a>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</body>
+</html>

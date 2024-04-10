@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Gallery</title>
+    <style>
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .image-container {
+            margin: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 200px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .image-details {
+            margin-top: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .image-details strong {
+            display: inline-block;
+        }
+        .editable {
+            color: blue;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: #ff3333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        #update-btn {
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Image Gallery for Lonely images - without active quizes: {{ current_quiz.name }} ({{ images|length }} images)</h2>
+    
+    <!-- GO BACK TO EDIT THIS QUIZ -->
+    <a href="{{ url_for('index') }}">Back to ALL Quizzes</a>
+    
+    <div class="gallery">
+      {% for image in images %}
+      <div class="image-container">
+        {% if image['thumbnail'] %}
+            <img src="data:image/jpg;base64,{{ image['thumbnail'] }}" alt="{{ image['filename'] }}">
+            {% else %}
+            <p style="color: orange;">NO THUMBNAIL</p>
+        {% endif %}
+        <div class="image-details">
+            <strong>Quiz Name:</strong>
+            <select class="editable quiz-name" data-field="quiz_id" data-id="{{ image['_id'] }}">
+                {% for quiz in quizzes %}
+                <option value="{{ quiz._id }}" {% if image['quiz_id'] == quiz._id|string %}selected{% endif %}>{{ quiz.name }}</option>
+                {% endfor %}
+            </select>
+            <p><strong>Score:</strong>
+                <span class="editable" data-field="score" data-id="{{ image['_id'] }}" contenteditable="true">{{ image['score'] }}</span>
+            </p>
+            <p><strong>Description:</strong>
+                <span class="editable" data-field="image_description" data-id="{{ image['_id'] }}" contenteditable="true">{{ image['image_description'] }}</span>
+            </p>
+            <p><strong>Assignment:</strong>
+                <select class="editable" data-field="assignment">
+                    <option value="Low" {% if image.assignment == 'Low' %}selected{% endif %}>Low</option>
+                    <option value="Medium" {% if image.assignment == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="High" {% if image.assignment == 'High' %}selected{% endif %}>High</option>
+                </select>
+            </p>
+            <p><strong>Replace Image:</strong>
+                <input type="file" class="replace-image" data-id="{{ image['_id'] }}">
+            </p>
+            <a href="{{ url_for('delete_gallery_image', quiz_id=image['quiz_id'], image_id=image['_id']) }}" onclick="return confirm('Are you sure?')">Delete</a>
+            <button class="update-btn" data-id="{{ image['_id'] }}">Update</button>
+        </div>
+    </div>
+      {% endfor %}
+      <button id="update-all-btn">Update All</button>
+    </div>
+    <script>
+      document.querySelectorAll('.update-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const imageId = this.getAttribute('data-id');
+          const updatedData = {};
+          const container = this.closest('.image-container');
+          const editableFields = container.querySelectorAll('.editable');
+          editableFields.forEach(field => {
+            const fieldName = field.getAttribute('data-field');
+            const fieldValue = field.value || field.textContent.trim();
+            updatedData[fieldName] = fieldValue;
+          });
+          fetch(`/update_image/${imageId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+          })
+          .then(response => {
+            if (response.ok) {
+              alert('Changes applied successfully!');
+              location.reload(); // Reload the page to reflect the updated changes
+            } else {
+              alert('Failed to apply changes!');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        });
+      });
+  
+      document.querySelectorAll('.replace-image').forEach(input => {
+        input.addEventListener('change', function() {
+          const imageId = this.getAttribute('data-id');
+          const file = this.files[0];
+          const formData = new FormData();
+          formData.append('file', file);
+          fetch(`/replace_image/${imageId}`, {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => {
+            if (response.ok) {
+              alert('Image replaced successfully!');
+              location.reload(); // Reload the page to reflect the updated changes
+            } else {
+              alert('Failed to replace image!');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        });
+      });
+  
+      document.getElementById('update-all-btn').addEventListener('click', function() {
+        const updatedData = {};
+        const imageContainers = document.querySelectorAll('.image-container');
+        imageContainers.forEach(container => {
+          const imageId = container.querySelector('.update-btn').getAttribute('data-id');
+          const editableFields = container.querySelectorAll('.editable');
+          editableFields.forEach(field => {
+            const fieldName = field.getAttribute('data-field');
+            const fieldValue = field.value || field.textContent.trim();
+            updatedData[fieldName] = fieldValue;
+          });
+          fetch(`/update_image/${imageId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+          })
+          .then(response => {
+            if (response.ok) {
+              alert('Changes applied successfully!');
+              location.reload(); // Reload the page to reflect the updated changes
+            } else {
+              alert('Failed to apply changes!');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

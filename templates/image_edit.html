@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Details</title>
+</head>
+<body>
+    <h1>Details: Image {{ image['_id'] }}</h1>
+    <div>
+        <h2>Full Image</h2>
+        <img src="data:image/jpg;base64,{{ image['data'] }}" alt="{{ image['filename'] }}" style="max-width: 100%;">
+    </div>
+    <div>
+        <h2>Replace Image</h2>
+        <form id="replace-image-form" action="{{ url_for('replace_image', image_id=image['_id']) }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit">Replace Image</button>
+        </form>
+    </div>
+    <form id="apply-changes-form" action="{{ url_for('image_edit', image_id=image['_id']) }}" method="post">
+        {% for key, value in image.items() %}
+        <div>
+            <label for="{{ key }}">{{ key }}:</label>
+            {% if key == 'quiz_id' %}
+            <select name="{{ key }}">
+                {% for quiz in quizzes %}
+                <option value="{{ quiz._id }}" {% if image['quiz_id'] == quiz._id|string %}selected{% endif %}>{{ quiz.name }}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit">Apply Changes</button>
+    </form>
+    <script>
+        document.getElementById("replace-image-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    var formData = new FormData(event.target);
+    fetch(event.target.action, {
+        method: "POST",
+        body: formData
+    })
+    .then(function(response) {
+        if (response.ok) {
+            alert("Image replaced successfully!");
+            window.location.href = "{{ url_for('images') }}";
+        } else {
+            alert("Error replacing image.");
+        }
+    })
+    .catch(function(error) {
+        alert("An error occurred. Please try again later.");
+        console.error(error);
+    });
+});
+
+        document.getElementById("apply-changes-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var formData = {};
+            var inputs = event.target.getElementsByTagName("input");
+            var selects = event.target.getElementsByTagName("select");
+            for (var i = 0; i < inputs.length; i++) {
+                formData[inputs[i].name] = inputs[i].value;
+            }
+            for (var j = 0; j < selects.length; j++) {
+                formData[selects[j].name] = selects[j].value;
+            }
+            fetch(event.target.action, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    alert("Image updated successfully!");
+                    window.location.href = "{{ url_for('images') }}";
+                } else {
+                    alert("Error updating image. Check if the quiz exists.");
+                }
+            })
+            .catch(function(error) {
+                alert("An error occurred. Please try again later.");
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

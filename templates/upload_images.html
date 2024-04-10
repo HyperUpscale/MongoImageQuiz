@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Multiple Images</title>
+</head>
+<body>
+  <h1>Upload Multiple Images</h1>
+  <BR>
+      
+    <!-- GO BACK TO EDIT THIS QUIZ -->
+      <a href="{{ url_for('edit', quiz_id=current_quiz._id) }}">Back to Edit Quiz</a>
+
+    <BR> <BR> <BR>
+  <form action="{{ url_for('upload_images') }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="images" multiple>
+    <select name="quiz_id">
+      {% for quiz in quizzes %}
+      <option value="{{ quiz._id }}" {% if request.args.get('quiz_id') == quiz._id|string %}selected{% endif %}>{{ quiz.name }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" name="score" placeholder="Score">
+    <input type="text" name="image_description" placeholder="Image Description">
+    <select name="assignment">
+      <option value="1">Low</option>
+      <option value="2">Medium</option>
+      <option value="3">High</option>
+    </select>
+    <input type="submit" name="upload_batch" value="Upload This Batch">
+    <input type="submit" name="upload_and_edit" value="Upload and Edit Quiz">
+  </form>
+
+  {% if current_quiz %}
+  <h2>Images for Quiz: {{ current_quiz.name }}</h2>
+  <div class="gallery">
+    {% for image in images %}
+    <div class="image-container">
+      <img src="data:image/jpg;base64,{{ image['thumbnail'] }}" alt="{{ image['filename'] }}">
+      <div class="image-details">
+        <!-- Display other image details here -->
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</body>
+</html>

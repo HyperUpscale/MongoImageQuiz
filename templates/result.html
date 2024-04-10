@@ -1,0 +1,88 @@
+<html>
+<head>
+    <title>Quiz Result Page </title>
+    <style>
+     .image-container {
+    display: flex;
+    gap: 20px;
+    }
+
+    .image-card {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .card-details {
+        padding: 10px;
+    }
+
+
+    </style>
+</head>
+<body>
+    <!-- <h1>Upload Result Image</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="result_image" accept="image/*" required>
+        <label for="score_from">Score From:</label>
+        <input type="number" name="score_from" required>
+        <label for="score_to">Score To:</label>
+        <input type="number" name="score_to" required>
+        <label for="result_text">Result Text:</label>
+        <textarea name="result_text"></textarea>
+        <input type="submit" value="Upload as a result image">
+    </form> -->
+    <h2>QUIZ: {{ quiz.name }}</h2>
+
+
+
+    <h2>Current Score: {{ current_score }}</h2>
+
+    <a href="{{ url_for('start', quiz_id=quiz._id) }}" class="btn btn-success">Start FROM THE BEGINING </a>
+
+    <br>
+    <br>
+    <a href="{{ url_for('index') }}">ALL QUIZZES</a>
+    <br>
+    <br>
+
+    <a href="{{ url_for('reset') }}">Reset</a>
+    
+<!--     
+    {% if result_doc and result_doc['data'] %}
+    <img src="data:image/jpg;base64,{{ result_doc['data'] }}" alt="Result Image">
+    <p>{{ result_doc['result_text'] }}</p>
+    {% else %}
+    <p>No result image available.</p>
+    {% endif %}
+    
+    {% for result in result_gallery %}
+    <div class="result-image">
+        <img src="data:image/jpg;base64,{{ result['data'] }}" alt="Result Image">
+        <p>Score range: {{ result['score_from'] }} - {{ result['score_to'] }}</p>
+        <p>{{ result['result_text'] }}</p>
+    </div>
+    {% endfor %} -->
+
+
+    <h2>Result Gallery</h2>
+    <div class="image-container">
+        {% for image in result_images %}
+        <div>
+            <img src="data:image/jpg;base64,{{ image['thumbnail'] }}" alt="{{ image['filename'] }}">
+            <p>Score Range: {{ image['score_from'] }} - {{ image['score_to'] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</body>
+</html>
